@@ -139,6 +139,7 @@ and apply_coercion_result loc strict funct params args cc_res =
                       ap_tailcall=Default_tailcall;
                       ap_inlined=Default_inline;
                       ap_specialised=Default_specialise;
+                      ap_arity=Arity_unknown;
                     })))
 
 and wrap_id_pos_list loc id_pos_list get_field lam =
@@ -234,6 +235,7 @@ let mod_prim name args loc =
       ap_tailcall = Default_tailcall;
       ap_inlined = Default_inline;
       ap_specialised = Default_specialise;
+      ap_arity = Arity_unknown;
     }
   with Not_found ->
     fatal_error ("Primitive " ^ name ^ " not found.")
@@ -595,7 +597,8 @@ and transl_apply ~scopes ~loc ~cc mod_env funct translated_arg =
        ap_args=[translated_arg];
        ap_tailcall=Default_tailcall;
        ap_inlined=inlined_attribute;
-       ap_specialised=Default_specialise})
+       ap_specialised=Default_specialise;
+       ap_arity=Arity_unknown})
 
 and transl_struct ~scopes loc fields cc rootpath {str_final_env; str_items; _} =
   transl_structure ~scopes loc fields cc rootpath str_final_env str_items
@@ -1511,6 +1514,7 @@ let toploop_getvalue id =
     ap_tailcall=Default_tailcall;
     ap_inlined=Default_inline;
     ap_specialised=Default_specialise;
+                      ap_arity=Arity_unknown;
   }
 
 let toploop_setvalue id lam =
@@ -1526,6 +1530,7 @@ let toploop_setvalue id lam =
     ap_tailcall=Default_tailcall;
     ap_inlined=Default_inline;
     ap_specialised=Default_specialise;
+                      ap_arity=Arity_unknown;
   }
 
 let toploop_setvalue_id id = toploop_setvalue id (Lvar id)

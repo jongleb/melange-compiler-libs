@@ -353,6 +353,8 @@ type specialise_attribute =
   | Never_specialise (* [@specialise never] *)
   | Default_specialise (* no [@specialise] attribute *)
 
+type apply_arity = Arity_unknown | Arity_exact
+
 let equal_specialise_attribute x y =
   match x, y with
   | Always_specialise, Always_specialise
@@ -466,7 +468,8 @@ and lambda_apply =
     ap_loc : scoped_location;
     ap_tailcall : tailcall_attribute;
     ap_inlined : inline_attribute;
-    ap_specialised : specialise_attribute; }
+    ap_specialised : specialise_attribute;
+    ap_arity : apply_arity; }
 
 and lambda_switch =
   { sw_numconsts: int;
@@ -1075,7 +1078,7 @@ let shallow_map f = function
   | Lmutvar _
   | Lconst _ as lam -> lam
   | Lapply { ap_func; ap_args; ap_loc; ap_tailcall;
-             ap_inlined; ap_specialised } ->
+             ap_inlined; ap_specialised; ap_arity } ->
       Lapply {
         ap_func = f ap_func;
         ap_args = List.map f ap_args;
@@ -1083,6 +1086,7 @@ let shallow_map f = function
         ap_tailcall;
         ap_inlined;
         ap_specialised;
+        ap_arity;
       }
   | Lfunction lfun ->
       Lfunction (map_lfunction f lfun)

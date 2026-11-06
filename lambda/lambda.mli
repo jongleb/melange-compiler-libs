@@ -370,6 +370,12 @@ type specialise_attribute =
   | Never_specialise (* [@specialise never] *)
   | Default_specialise (* no [@specialise] attribute *)
 
+type apply_arity =
+  | Arity_unknown
+  | Arity_exact
+      (** the type of the callee proves that it takes exactly the arguments
+          of the application *)
+
 val equal_specialise_attribute
    : specialise_attribute
   -> specialise_attribute
@@ -495,7 +501,8 @@ and lambda_apply =
     ap_loc : scoped_location;
     ap_tailcall : tailcall_attribute;
     ap_inlined : inline_attribute; (* specified with the [@inlined] attribute *)
-    ap_specialised : specialise_attribute; }
+    ap_specialised : specialise_attribute;
+    ap_arity : apply_arity; }
 
 and lambda_switch =
   { sw_numconsts: int;                  (* Number of integer cases *)
