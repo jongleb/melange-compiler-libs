@@ -102,6 +102,31 @@ let scrape_poly env ty =
       | d -> d)
     ty
 
+let application_result_arity env ty =
+  match scrape_poly env ty with
+  | Some (Ttuple _ | Tvariant _) -> Arity_exact
+  | Some (Tconstr (path, _, _)) ->
+      (match Predef.find_type_constr path with
+      | Some (#Predef.data_type_constr
+             | `Int | `Char | `String | `Bytes | `Float | `Int32 | `Int64
+             | `Nativeint | `Array | `Floatarray | `Extension_constructor) ->
+          Arity_exact
+      | Some (`Continuation | `Lazy_t | `Iarray | `Atomic_loc) ->
+          Arity_unknown
+      | None ->
+          match (Env.find_type path env).type_kind with
+          | Type_record (_, (Record_regular | Record_float
+                            | Record_inlined _ | Record_extension _))
+          | Type_variant (_, Variant_regular)
+          | Type_open -> Arity_exact
+          | Type_record (_, Record_unboxed _)
+          | Type_variant (_, Variant_unboxed)
+          | Type_abstract _ -> Arity_unknown
+          | exception Not_found -> Arity_unknown)
+  | Some (Tvar _ | Tarrow _ | Tobject _ | Tfield _ | Tnil | Tlink _
+         | Tsubst _ | Tunivar _ | Tpoly _ | Tpackage _)
+  | None -> Arity_unknown
+
 let is_function_type env ty =
   match scrape env ty with
   | Some (Tarrow (_, lhs, rhs, _)) -> Some (lhs, rhs)
